@@ -1,0 +1,24 @@
+# Dependencias
+node_modules/
+
+
+# Variables de entorno (IMPORTANTE: nunca subir a Git)
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporal
+tmp/
+temp/

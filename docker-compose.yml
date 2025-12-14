@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  pulsepro-backend:
+    container_name: pulsepro-backend
+    build: .
+    restart: always
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - PORT=${PORT:-3000}
+      - BASE_URL=${BASE_URL}
+      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
