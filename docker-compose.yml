@@ -2,14 +2,27 @@ version: '3.8'
 
 services:
   pulsepro-backend:
-    # En Swarm no se usa 'build' ni 'container_name'
     image: ghcr.io/gadiel-bot09/impulsepro:main
     deploy:
       restart_policy:
         condition: on-failure
-    ports:
-      - "${PORT:-3000}:${PORT:-3000}"
+      labels:
+        # Habilitar Traefik
+        - "traefik.enable=true"
+        # Configurar dominio
+        - "traefik.http.routers.pulsepro.rule=Host(`impulsepro.sinuhub.com`)"
+        - "traefik.http.routers.pulsepro.entrypoints=websecure"
+        # Certificados SSL (Ajusta 'myresolver' si tu Traefik usa otro nombre, ej: 'le', 'letsencrypt')
+        - "traefik.http.routers.pulsepro.tls.certresolver=letsencryptresolver"
+        # Puerto interno del contenedor
+        - "traefik.http.services.pulsepro.loadbalancer.server.port=3000"
     environment:
-      - PORT=${PORT:-3000}
+      - PORT=3000
       - BASE_URL=${BASE_URL}
       - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
+    networks:
+      - SinuNet
+
+networks:
+  traefik_public:
+    external: true
