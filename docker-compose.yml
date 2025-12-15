@@ -2,9 +2,11 @@ version: '3.8'
 
 services:
   pulsepro-backend:
-    container_name: pulsepro-backend
-    build: .
-    restart: always
+    # En Swarm no se usa 'build' ni 'container_name'
+    image: ghcr.io/gadiel-bot09/impulsepro:main
+    deploy:
+      restart_policy:
+        condition: on-failure
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
     environment:
