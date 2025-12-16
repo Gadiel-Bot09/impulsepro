@@ -1,28 +1,48 @@
-version: '3.8'
+## Altere los siguientes datos:
+# nombre de su sitio web: impulsepro
+# red interna: SinuNet
+# link de su sitio: impulsepro.com
 
+version: "3.7"
 services:
-  pulsepro-backend:
-    image: ghcr.io/gadiel-bot09/impulsepro:main
-    deploy:
-      restart_policy:
-        condition: on-failure
-      labels:
-        # Habilitar Traefik
-        - "traefik.enable=true"
-        # Configurar dominio
-        - "traefik.http.routers.pulsepro.rule=Host(`impulsepro.sinuhub.com`)"
-        - "traefik.http.routers.pulsepro.entrypoints=websecure"
-        # Certificados SSL (Ajusta 'myresolver' si tu Traefik usa otro nombre, ej: 'le', 'letsencrypt')
-        - "traefik.http.routers.pulsepro.tls.certresolver=letsencryptresolver"
-        # Puerto interno del contenedor
-        - "traefik.http.services.pulsepro.loadbalancer.server.port=3000"
-    environment:
-      - PORT=3000
-      - BASE_URL=${BASE_URL}
-      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
+
+  ## --------------------------- SINUHUB --------------------------- ##
+
+  impulsepro:
+    image: php:8.4.7-apache
+
+    volumes:
+      - /root/impulsepro:/var/www/html/ ## Cambie "meu-site" para el nombre de su sitio
+
     networks:
-      - SinuNet
+      - SinuNet ## Nome da rede interna
+
+    environment:
+      - TZ=America/Bogota
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1024M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.impulsepro.rule=Host(`impulsepro.com`) ## link de su sitio
+        - traefik.http.services.impulsepro.loadbalancer.server.port=80
+        - traefik.http.routers.impulsepro.service=impulsepro
+        - traefik.http.routers.impulsepro.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.impulsepro.entrypoints=websecure
+        - traefik.http.routers.impulsepro.tls=true
+
+## --------------------------- SINUHUB --------------------------- ##
 
 networks:
-  traefik_public:
+  SinuNet:
+    ## Nombre de la red interna
+    name: SinuNet ## Nome da rede interna
     external: true
